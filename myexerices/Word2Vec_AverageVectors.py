@@ -1,24 +1,18 @@
-#!/usr/bin/env python
-
-#  Author: Angela Chapman
-#  Date: 8/6/2014
-#
-#  This file contains code to accompany the Kaggle tutorial
-#  "Deep learning goes to the movies".  The code in this file
+# The code in this file
 #  is for Parts 2 and 3 of the tutorial, which cover how to
 #  train a model using Word2Vec.
 #
 # *************************************** #
 
 
-# ****** Read the two training sets and the test set
+# ******导入训练集和测试
 #
 import pandas as pd
 import os
 from nltk.corpus import stopwords
 import nltk.data
 import logging
-import numpy as np  # Make sure that numpy is imported
+import numpy as np
 from gensim.models import Word2Vec
 from sklearn.ensemble import RandomForestClassifier
 
@@ -37,30 +31,28 @@ def makeFeatureVec(words, model, num_features):
     #
     nwords = 0.
     #
-    # Index2word is a list that contains the names of the words in
-    # the model's vocabulary. Convert it to a set, for speed
+    # Index2word是一个列表，其中包含以下单词的名称
+    #  模型的词汇量。将其转换为一组以提高速度
     index2word_set = set(model.wv.index2word)
     #
-    # Loop over each word in the review and, if it is in the model's
-    # vocaublary, add its feature vector to the total
+    # 遍历评论中的每个单词，如果该单词在模型的
+    # vocaublary，将其特征向量添加到总数中
     for word in words:
         if word in index2word_set:
             nwords = nwords + 1.
             featureVec = np.add(featureVec, model[word])
     #
-    # Divide the result by the number of words to get the average
+    # 将结果除以字数即可得出平均值
     featureVec = np.divide(featureVec, nwords)
     return featureVec
 
 
 def getAvgFeatureVecs(reviews, model, num_features):
-    # Given a set of reviews (each one a list of words), calculate
-    # the average feature vector for each one and return a 2D numpy array
-    #
-    # Initialize a counter
+
     counter = 0.
-    #
-    # Preallocate a 2D numpy array, for speed
+    #给定一组评论（每个评论一个单词列表），计算
+    #每个特征向量的平均特征向量，并返回2D
+    #numpy数组
     reviewFeatureVecs = np.zeros((len(reviews), num_features), dtype="float32")
     #
     # Loop through the reviews
@@ -120,33 +112,26 @@ if __name__ == '__main__':
     for review in unlabeled_train["review"]:
         sentences += KaggleWord2VecUtility.review_to_sentences(review, tokenizer)
 
-    # ****** Set parameters and train the word2vec model
-    #
-    # Import the built-in logging module and configure it so that Word2Vec
-    # creates nice output messages
+
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', \
                         level=logging.INFO)
 
-    # Set values for various parameters
-    num_features = 300  # Word vector dimensionality
-    min_word_count = 40  # Minimum word count
-    num_workers = 4  # Number of threads to run in parallel
-    context = 10  # Context window size
-    downsampling = 1e-3  # Downsample setting for frequent words
+    # 设置各种参数的值
+    num_features = 300  # 词向量维数
+    min_word_count = 40
+    num_workers = 4  #并行运行的线程数
+    context = 10
+    downsampling = 1e-3  #下采样设置
 
-    # Initialize and train the model (this will take some time)
-    print(
-    "Training Word2Vec model...")
+    print("Training Word2Vec model...")
     model = Word2Vec(sentences, workers=num_workers, \
                      size=num_features, min_count=min_word_count, \
                      window=context, sample=downsampling, seed=1)
 
-    # If you don't plan to train the model any further, calling
-    # init_sims will make the model much more memory-efficient.
+
     model.init_sims(replace=True)
 
-    # It can be helpful to create a meaningful model name and
-    # save the model for later use. You can load it later using Word2Vec.load()
+
     model_name = "300features_40minwords_10context"
     model.save(model_name)
 
@@ -169,13 +154,11 @@ if __name__ == '__main__':
 
     testDataVecs = getAvgFeatureVecs(getCleanReviews(test), model, num_features)
 
-    # ****** Fit a random forest to the training set, then make predictions
-    #
-    # Fit a random forest to the training data, using 100 trees
+
+    # 使用100棵树为训练数据拟合一个随机森林
     forest = RandomForestClassifier(n_estimators=100)
 
-    print(
-    "Fitting a random forest to labeled training data...")
+    print("Fitting a random forest to labeled training data...")
     forest = forest.fit(trainDataVecs, train["sentiment"])
 
     # Test & extract results
@@ -184,5 +167,4 @@ if __name__ == '__main__':
     # Write the test results
     output = pd.DataFrame(data={"id": test["id"], "sentiment": result})
     output.to_csv("Word2Vec_AverageVectors.csv", index=False, quoting=3)
-    print(
-    "Wrote Word2Vec_AverageVectors.csv")
+    print("Wrote Word2Vec_AverageVectors.csv")

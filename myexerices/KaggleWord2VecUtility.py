@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import re
 import nltk
 
@@ -15,8 +13,8 @@ class KaggleWord2VecUtility(object):
 
     @staticmethod
     def review_to_wordlist( review, remove_stopwords=False ):
-        # Function to convert a document to a sequence of words,
-        # optionally removing stop words.  Returns a list of words.
+        # 函数将文档转换为单词序列，
+        #（可选）删除停用词。返回单词列表。
         #
         # 1. Remove HTML
         review_text = BeautifulSoup(review).get_text()
@@ -35,11 +33,11 @@ class KaggleWord2VecUtility(object):
         # 6. Return a list of words
         return(words)
 
-    # Define a function to split a review into parsed sentences
+    # 拆分评论为已解析句子
     @staticmethod
     def review_to_sentences( review, tokenizer, remove_stopwords=False ):
-        # Function to split a review into parsed sentences. Returns a
-        # list of sentences, where each sentence is a list of words
+        # 函数将评论拆分为已解析的句子。返回一个
+        # 句子列表，其中每个句子都是单词列表
         #
         # 1. Use the NLTK tokenizer to split the paragraph into sentences
         raw_sentences = tokenizer.tokenize(review.encode('utf8').decode('utf8').strip())
@@ -52,7 +50,5 @@ class KaggleWord2VecUtility(object):
                 # Otherwise, call review_to_wordlist to get a list of words
                 sentences.append( KaggleWord2VecUtility.review_to_wordlist( raw_sentence, \
                   remove_stopwords ))
-        #
-        # Return the list of sentences (each sentence is a list of words,
-        # so this returns a list of lists
+
         return sentences
