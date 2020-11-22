@@ -42,7 +42,7 @@ class KaggleWord2VecUtility(object):
         # 1. Use the NLTK tokenizer to split the paragraph into sentences
         raw_sentences = tokenizer.tokenize(review.encode('utf8').decode('utf8').strip())
         #
-        # 2. Loop over each sentence
+        # 2. 遍历每一个句子
         sentences = []
         for raw_sentence in raw_sentences:
             # If a sentence is empty, skip it
